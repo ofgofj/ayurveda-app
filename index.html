@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>アーユルヴェーダ体質診断</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green-dark: #2d5016;
+  --green-mid: #4a7c28;
+  --green-light: #7ab648;
+  --green-pale: #c8e6a0;
+  --beige: #f5f0e1;
+  --beige-dark: #e8dcc8;
+  --beige-light: #faf7f0;
+  --brown: #5c4033;
+  --brown-light: #8b6f5e;
+  --white: #ffffff;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --vata-color: #7b9ec7;
+  --pitta-color: #d4845a;
+  --kapha-color: #6aab7b;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+  background-color: var(--beige);
+  color: var(--brown);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+
+header {
+  background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+  color: var(--white);
+  text-align: center;
+  padding: 1.5rem 1rem;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+header p {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-top: 0.3rem;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Auto-detect info */
+.auto-info {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.auto-info-item {
+  flex: 1;
+  background: var(--green-pale);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+}
+
+.auto-info-item .label {
+  font-size: 0.75rem;
+  color: var(--green-dark);
+  font-weight: 600;
+}
+
+.auto-info-item .value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--green-dark);
+  margin-top: 0.2rem;
+}
+
+/* Cards */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  color: var(--green-dark);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--green-pale);
+}
+
+.card h3 {
+  font-size: 1rem;
+  color: var(--green-mid);
+  margin: 1rem 0 0.5rem;
+}
+
+/* Form */
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: var(--brown);
+}
+
+.hint {
+  font-size: 0.75rem;
+  color: var(--brown-light);
+  margin-bottom: 0.5rem;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1.5px solid var(--beige-dark);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--beige-light);
+  color: var(--brown);
+  transition: border-color 0.2s;
+}
+
+input[type="number"]:focus {
+  outline: none;
+  border-color: var(--green-mid);
+}
+
+select[multiple] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1.5px solid var(--beige-dark);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--beige-light);
+  color: var(--brown);
+  min-height: 180px;
+}
+
+select[multiple]:focus {
+  outline: none;
+  border-color: var(--green-mid);
+}
+
+select[multiple] option {
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  margin: 1px 0;
+}
+
+select[multiple] option:checked {
+  background: var(--green-light);
+  color: var(--white);
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.btn-diagnose {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow);
+  letter-spacing: 0.05em;
+}
+
+.btn-diagnose:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-diagnose:active {
+  transform: translateY(0);
+}
+
+.btn-reset {
+  display: block;
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--beige-dark);
+  color: var(--brown);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background 0.2s;
+}
+
+.btn-reset:hover {
+  background: #d9ccb5;
+}
+
+/* Results */
+#results {
+  display: none;
+}
+
+.dosha-result-header {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  color: var(--white);
+}
+
+.dosha-result-header.vata { background: linear-gradient(135deg, #5a82a8, var(--vata-color)); }
+.dosha-result-header.pitta { background: linear-gradient(135deg, #b86a3a, var(--pitta-color)); }
+.dosha-result-header.kapha { background: linear-gradient(135deg, #4a8a5a, var(--kapha-color)); }
+
+.dosha-result-header .dosha-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.dosha-result-header .dosha-element {
+  font-size: 1rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+.dosha-result-header .dosha-chars {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 0.5rem;
+}
+
+/* Score bars */
+.score-bars {
+  margin: 1rem 0;
+}
+
+.score-bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.score-bar-label {
+  width: 70px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.score-bar-track {
+  flex: 1;
+  height: 20px;
+  background: var(--beige);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 0 0.5rem;
+}
+
+.score-bar-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.6s ease;
+}
+
+.score-bar-fill.vata { background: var(--vata-color); }
+.score-bar-fill.pitta { background: var(--pitta-color); }
+.score-bar-fill.kapha { background: var(--kapha-color); }
+
+.score-bar-value {
+  width: 30px;
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Advice card */
+.advice-text {
+  background: var(--beige-light);
+  border-left: 4px solid var(--green-mid);
+  padding: 0.75rem 1rem;
+  border-radius: 0 8px 8px 0;
+  font-size: 0.9rem;
+  margin: 0.5rem 0;
+}
+
+/* Pose cards */
+.pose-item {
+  background: var(--beige-light);
+  border-radius: 8px;
+  padding: 0.85rem;
+  margin-bottom: 0.6rem;
+}
+
+.pose-item .pose-name {
+  font-weight: 700;
+  color: var(--green-dark);
+  font-size: 0.95rem;
+}
+
+.pose-item .pose-reason {
+  font-size: 0.82rem;
+  color: var(--brown-light);
+  margin-top: 0.2rem;
+}
+
+.pose-item .pose-tips {
+  font-size: 0.82rem;
+  color: var(--green-mid);
+  margin-top: 0.2rem;
+  font-style: italic;
+}
+
+/* Food list */
+.food-list {
+  list-style: none;
+}
+
+.food-list li {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--beige);
+  font-size: 0.88rem;
+}
+
+.food-list li:last-child {
+  border-bottom: none;
+}
+
+.food-list .food-name {
+  font-weight: 600;
+}
+
+.food-list .food-reason {
+  color: var(--brown-light);
+  font-size: 0.8rem;
+}
+
+.food-section-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0.75rem 0 0.4rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+.food-section-title.recommend {
+  background: #e6f4d7;
+  color: var(--green-dark);
+}
+
+.food-section-title.avoid {
+  background: #f9e4d8;
+  color: #8b3a1a;
+}
+
+/* Wake time */
+.wake-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.wake-box {
+  background: var(--beige-light);
+  border-radius: 8px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+.wake-box .wake-label {
+  font-size: 0.75rem;
+  color: var(--brown-light);
+}
+
+.wake-box .wake-time {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--green-dark);
+}
+
+/* Daily schedule */
+.schedule-item {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+}
+
+.schedule-period {
+  min-width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.schedule-period.morning { background: #ffeaa7; }
+.schedule-period.afternoon { background: #fab1a0; }
+.schedule-period.night { background: #a29bfe; color: var(--white); }
+
+.schedule-text {
+  font-size: 0.88rem;
+}
+
+.schedule-text strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--green-dark);
+}
+
+footer {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  font-size: 0.75rem;
+  color: var(--brown-light);
+}
+
+@media (max-width: 600px) {
+  header h1 { font-size: 1.25rem; }
+  .container { padding: 0.75rem; }
+  .auto-info { flex-direction: column; gap: 0.5rem; }
+  .wake-info { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>アーユルヴェーダ体質診断</h1>
+  <p>あなたのドーシャバランスを知り、心身を整えましょう</p>
+</header>
+
+<div class="container">
+
+  <!-- Auto-detected info -->
+  <div class="auto-info">
+    <div class="auto-info-item">
+      <div class="label">現在の季節</div>
+      <div class="value" id="season-display"></div>
+    </div>
+    <div class="auto-info-item">
+      <div class="label">現在の時間帯</div>
+      <div class="value" id="time-display"></div>
+    </div>
+  </div>
+
+  <!-- Input Form -->
+  <div id="form-area">
+    <form id="diagnose-form">
+      <div class="card">
+        <h2>睡眠について</h2>
+        <div class="form-group">
+          <label for="sleep">昨夜の睡眠時間（時間）</label>
+          <input type="number" id="sleep" min="0" max="24" step="0.5" placeholder="例: 7">
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>食事の好み</h2>
+        <div class="form-group">
+          <label for="food-pref">好む食べ物を選択してください</label>
+          <p class="hint">Ctrl / Cmd + クリックで複数選択</p>
+          <select multiple id="food-pref">
+            <option value="spicy">辛いもの</option>
+            <option value="sweet">甘いもの</option>
+            <option value="sour">酸っぱいもの</option>
+            <option value="salty">塩辛いもの</option>
+            <option value="bitter">苦いもの</option>
+            <option value="oily">油っぽいもの</option>
+            <option value="light">あっさりしたもの</option>
+            <option value="cold">冷たいもの</option>
+            <option value="warm">温かいもの</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>気分の傾向</h2>
+        <div class="form-group">
+          <label for="mood">最近の気分を選択してください</label>
+          <p class="hint">Ctrl / Cmd + クリックで複数選択</p>
+          <select multiple id="mood">
+            <option value="restless">落ち着かない</option>
+            <option value="anxious">不安感がある</option>
+            <option value="irritable">イライラする</option>
+            <option value="angry">怒りっぽい</option>
+            <option value="sluggish">だるい・重い</option>
+            <option value="sleepy">眠い</option>
+            <option value="cold-feeling">冷えを感じる</option>
+            <option value="hot-feeling">ほてりを感じる</option>
+            <option value="energetic">エネルギッシュ</option>
+            <option value="calm">穏やか</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-diagnose">診断する</button>
+    </form>
+  </div>
+
+  <!-- Results -->
+  <div id="results">
+    <div id="dosha-header" class="dosha-result-header">
+      <div class="dosha-name" id="result-dosha-name"></div>
+      <div class="dosha-element" id="result-dosha-element"></div>
+      <div class="dosha-chars" id="result-dosha-chars"></div>
+    </div>
+
+    <div class="card">
+      <h2>ドーシャスコア</h2>
+      <div class="score-bars" id="score-bars"></div>
+      <div class="advice-text" id="balance-advice"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="seasonal-pose-title"></h2>
+      <div id="seasonal-poses"></div>
+    </div>
+
+    <div class="card">
+      <h2 id="time-pose-title"></h2>
+      <div id="time-poses"></div>
+    </div>
+
+    <div class="card">
+      <h2>食べ物アドバイス</h2>
+      <div id="food-advice"></div>
+    </div>
+
+    <div class="card">
+      <h2>起床・就寝のすすめ</h2>
+      <div id="wake-advice"></div>
+    </div>
+
+    <div class="card">
+      <h2>1日の過ごし方</h2>
+      <div id="daily-schedule"></div>
+    </div>
+
+    <button class="btn-reset" id="btn-reset">もう一度診断する</button>
+  </div>
+
+</div>
+
+<footer>
+  アーユルヴェーダ体質診断 &copy; 2025 &mdash; 情報は一般的なもので、医療的なアドバイスではありません。
+</footer>
+
+<script>
+// ========== DATA ==========
+
+const doshas = {
+  vata: {
+    name: "ヴァータ",
+    element: "風・空",
+    characteristics: "動き、変化、乾燥、冷たさ、軽さのエネルギー",
+    balance_advice: "規則正しい生活、温かい食事、十分な休息を心がけましょう。ルーティンを大切にし、温かいオイルマッサージや穏やかなヨガが助けになります。"
+  },
+  pitta: {
+    name: "ピッタ",
+    element: "火・水",
+    characteristics: "変換、熱、鋭さ、強さのエネルギー",
+    balance_advice: "クールダウン、適度な運動、辛すぎない食事を意識しましょう。自然の中で過ごす時間や、競争心を手放すリラックスタイムが大切です。"
+  },
+  kapha: {
+    name: "カパ",
+    element: "水・地",
+    characteristics: "安定、潤い、重さ、ゆっくりのエネルギー",
+    balance_advice: "活動的に過ごし、軽めの食事、刺激的な体験を取り入れましょう。新しいことへの挑戦やダイナミックな運動がバランスを整えます。"
+  }
+};
+
+const seasonalPoses = {
+  spring: {
+    vata: [
+      { name: "山のポーズ（ターダ・アーサナ）", reason: "春の不安定さを安定させる", tips: "大地にしっかり根を張るイメージで" },
+      { name: "戦士のポーズI（ヴィーラバドラ・アーサナI）", reason: "下半身を強化し、グラウンディング", tips: "後ろ足のかかとをしっかり床に" },
+      { name: "子どものポーズ（バーラ・アーサナ）", reason: "心を落ち着かせる", tips: "額を床につけて深い呼吸を" }
+    ],
+    pitta: [
+      { name: "前屈（パスチモッターナ・アーサナ）", reason: "春の熱を冷ます", tips: "無理せず、気持ち良い範囲で" },
+      { name: "魚のポーズ（マツヤ・アーサナ）", reason: "胸を開き、熱を放散", tips: "首に負担をかけないように" },
+      { name: "ねじりのポーズ", reason: "デトックス効果", tips: "吐く息でねじりを深める" }
+    ],
+    kapha: [
+      { name: "太陽礼拝（スーリヤ・ナマスカーラ）", reason: "春のだるさを吹き飛ばす", tips: "12ポーズを流れるように" },
+      { name: "弓のポーズ（ダヌラ・アーサナ）", reason: "胸を開き、エネルギー活性化", tips: "呼吸を止めないように" },
+      { name: "ねじった三角のポーズ", reason: "消化促進とデトックス", tips: "腰からねじる意識で" }
+    ]
+  },
+  summer: {
+    vata: [
+      { name: "木のポーズ（ヴリクシャ・アーサナ）", reason: "夏の散漫さに集中力を", tips: "一点を見つめてバランスを" },
+      { name: "座位の前屈", reason: "落ち着きをもたらす", tips: "ゆっくりとした動きで" },
+      { name: "シャヴァ・アーサナ（屍のポーズ）", reason: "夏の疲れをリセット", tips: "10〜15分しっかり休息を" }
+    ],
+    pitta: [
+      { name: "月礼拝（チャンドラ・ナマスカーラ）", reason: "夏の熱を鎮める", tips: "夕方以降に行うのが理想的" },
+      { name: "肩立ちのポーズ（サルヴァンガ・アーサナ）", reason: "クーリング効果", tips: "首を守るためにブランケットを" },
+      { name: "シータリー呼吸法", reason: "体温を下げる", tips: "舌を丸めて息を吸う" }
+    ],
+    kapha: [
+      { name: "逆立ち（シールシャ・アーサナ）", reason: "夏の倦怠感を払拭", tips: "壁を使って安全に" },
+      { name: "ラクダのポーズ（ウシュトラ・アーサナ）", reason: "胸を大きく開く", tips: "腰を守るため、お尻を引き締めて" },
+      { name: "獅子のポーズ（シンハ・アーサナ）", reason: "喉の詰まりを解放", tips: "大きく「アー」と声を出して" }
+    ]
+  },
+  autumn: {
+    vata: [
+      { name: "猫と牛のポーズ", reason: "秋の乾燥から背骨を守る", tips: "ゆっくりとした動きで脊柱をほぐす" },
+      { name: "鳩のポーズ（カポタ・アーサナ）", reason: "股関節の柔軟性向上", tips: "ブランケットでサポートを" },
+      { name: "仰向けの合蹠（スプタ・バッダ・コーナ・アーサナ）", reason: "リラクゼーション", tips: "10分以上キープして深いリラックスを" }
+    ],
+    pitta: [
+      { name: "ハートオープナー系", reason: "秋の感情の整理", tips: "胸を開いて心も開放" },
+      { name: "ヨガニドラ（瞑想的休息）", reason: "心の熱を冷ます", tips: "ガイド音声を使うのもおすすめ" },
+      { name: "穏やかな前屈", reason: "内省を促す", tips: "競争心を手放して" }
+    ],
+    kapha: [
+      { name: "ダイナミックなヴィンヤサフロー", reason: "秋の停滞を打破", tips: "呼吸と動きを連動させて" },
+      { name: "プランクポーズのバリエーション", reason: "筋力維持", tips: "体幹を意識して30秒〜1分" },
+      { name: "ジャンプスルー・ジャンプバック", reason: "代謝を上げる", tips: "アシュタンガヨガのトランジション" }
+    ]
+  },
+  winter: {
+    vata: [
+      { name: "チャイルドポーズの長めキープ", reason: "冬の不安を和らげる", tips: "温かいブランケットをかけて" },
+      { name: "脚を壁に上げるポーズ", reason: "血行促進と安らぎ", tips: "壁際で15〜20分" },
+      { name: "優しいリストラティブヨガ", reason: "冬の疲れを癒す", tips: "プロップスを多用して完全リラックス" }
+    ],
+    pitta: [
+      { name: "座位の瞑想", reason: "冬の内省に最適", tips: "背筋を伸ばして15〜30分" },
+      { name: "優しいツイスト", reason: "内臓をケア", tips: "食後2時間以上空けて" },
+      { name: "アヌローマ・ヴィローマ（交互鼻呼吸）", reason: "バランス調整", tips: "左右5回ずつから始める" }
+    ],
+    kapha: [
+      { name: "活発な太陽礼拝", reason: "冬の重だるさ解消", tips: "朝一番に5〜10セット" },
+      { name: "カパーラバーティ（火の呼吸）", reason: "代謝アップ", tips: "空腹時に108回" },
+      { name: "バックベンド（後屈）系", reason: "胸を開き、エネルギー充填", tips: "ウォームアップを十分に" }
+    ]
+  }
+};
+
+const timePoses = {
+  morning: {
+    vata: [
+      { name: "優しいストレッチ", reason: "朝の体を穏やかに目覚めさせる", duration: "5〜10分" },
+      { name: "猫と牛のポーズ", reason: "背骨を柔軟にし、1日の準備を", duration: "5分" }
+    ],
+    pitta: [
+      { name: "月礼拝", reason: "朝のクールな状態を保ちながら体を動かす", duration: "10分" },
+      { name: "座位の瞑想", reason: "心を落ち着け、穏やかに1日をスタート", duration: "10〜15分" }
+    ],
+    kapha: [
+      { name: "活発な太陽礼拝", reason: "朝の重だるさを吹き飛ばす", duration: "15〜20分" },
+      { name: "カパーラバーティ", reason: "代謝を上げ、頭をクリアに", duration: "3〜5分" }
+    ]
+  },
+  afternoon: {
+    vata: [
+      { name: "短い瞑想休憩", reason: "午後の散漫さをリセット", duration: "5分" },
+      { name: "壁を使った脚上げ", reason: "疲れた脚を休め、心を落ち着ける", duration: "5〜10分" }
+    ],
+    pitta: [
+      { name: "穏やかな前屈", reason: "午後の熱を冷ます", duration: "10分" },
+      { name: "シータリー呼吸", reason: "体温を下げ、リフレッシュ", duration: "3〜5分" }
+    ],
+    kapha: [
+      { name: "パワーヨガ短時間", reason: "午後の眠気を払拭", duration: "10〜15分" },
+      { name: "逆転のポーズ", reason: "血行を促進し、エネルギーアップ", duration: "5分" }
+    ]
+  },
+  evening: {
+    vata: [
+      { name: "リストラティブヨガ", reason: "1日の緊張をゆっくりほどく", duration: "20〜30分" },
+      { name: "仰向けのツイスト", reason: "背骨をリリースし、安らぎを", duration: "10分" }
+    ],
+    pitta: [
+      { name: "ヨガニドラ", reason: "心身を深くリラックスさせる", duration: "20〜30分" },
+      { name: "前屈中心の練習", reason: "副交感神経を優位にする", duration: "15分" }
+    ],
+    kapha: [
+      { name: "中程度の強度フロー", reason: "夕方のエネルギーを使い切る", duration: "30分" },
+      { name: "ツイスト系", reason: "消化を助け、デトックス", duration: "10分" }
+    ]
+  },
+  night: {
+    vata: [
+      { name: "ベッドヨガ", reason: "安らかな眠りへ導く", duration: "10分" },
+      { name: "ナディ・ショーダナ", reason: "神経系を整え、深い睡眠を", duration: "5〜10分" }
+    ],
+    pitta: [
+      { name: "月光浴瞑想", reason: "心の熱を手放し、穏やかな夜を", duration: "10〜15分" },
+      { name: "シャヴァ・アーサナ", reason: "完全なリラクゼーションで1日を締めくくる", duration: "15〜20分" }
+    ],
+    kapha: [
+      { name: "軽いストレッチ", reason: "心地よい疲労感で質の良い眠りを", duration: "10分" },
+      { name: "穏やかな呼吸法", reason: "副交感神経を優位にし、入眠をスムーズに", duration: "5分" }
+    ]
+  }
+};
+
+const foods = {
+  vata: {
+    recommended: [
+      { food: "温かいスープ", reason: "体を温め潤いを与えます" },
+      { food: "根菜類", reason: "グラウンディング効果があります" },
+      { food: "ギー", reason: "乾燥を防ぎ、消化を助けます" },
+      { food: "アボカド", reason: "良質な脂質で体を潤します" },
+      { food: "温かいミルク", reason: "心を落ち着かせ、安眠を促します" },
+      { food: "バナナ", reason: "甘味が心身の安定をもたらします" },
+      { food: "ナッツ類", reason: "栄養豊富で満足感を与えます" }
+    ],
+    avoid: [
+      { food: "生野菜サラダ", reason: "冷たく乾燥性を高めます" },
+      { food: "炭酸飲料", reason: "ガスでお腹が張りやすくなります" },
+      { food: "カフェイン過多", reason: "不安を増幅させます" },
+      { food: "ドライフルーツ過剰", reason: "乾燥性を高めます" }
+    ]
+  },
+  pitta: {
+    recommended: [
+      { food: "キュウリ", reason: "クーリング効果で体を冷やします" },
+      { food: "ココナッツ", reason: "体を冷やし潤いを与えます" },
+      { food: "甘いフルーツ", reason: "熱を鎮め心を穏やかにします" },
+      { food: "コリアンダー", reason: "消化を助け体を冷やします" },
+      { food: "緑葉野菜", reason: "ビタミン豊富で冷性があります" },
+      { food: "ミントティー", reason: "清涼感でリフレッシュできます" },
+      { food: "豆腐", reason: "良質な植物性タンパク質です" }
+    ],
+    avoid: [
+      { food: "辛い香辛料", reason: "熱を増幅させます" },
+      { food: "揚げ物", reason: "油が熱を高めます" },
+      { food: "赤身肉過剰", reason: "体を温めすぎます" },
+      { food: "トマト過剰", reason: "酸味が熱を高めます" }
+    ]
+  },
+  kapha: {
+    recommended: [
+      { food: "生姜", reason: "代謝を上げ消化力を高めます" },
+      { food: "黒胡椒", reason: "消化の火を強化します" },
+      { food: "緑茶", reason: "軽い刺激と抗酸化作用があります" },
+      { food: "リンゴ", reason: "軽くて消化に良いです" },
+      { food: "キノア", reason: "軽い穀物でエネルギー源になります" },
+      { food: "レモン", reason: "デトックス効果があります" },
+      { food: "葉物野菜", reason: "軽さと新鮮さをもたらします" }
+    ],
+    avoid: [
+      { food: "乳製品過剰", reason: "粘液を増やします" },
+      { food: "甘いデザート", reason: "重さを増します" },
+      { food: "揚げ物", reason: "油が重さを加えます" },
+      { food: "小麦製品過剰", reason: "カパを増やします" }
+    ]
+  }
+};
+
+const wakeTimes = {
+  vata: {
+    time: "6:00〜6:30",
+    reason: "規則的なリズムがヴァータを安定させます。日の出の時間帯は穏やかで、散漫になりがちな心を落ち着かせてくれます。",
+    bedtime: "22:00〜22:30"
+  },
+  pitta: {
+    time: "5:30〜6:00",
+    reason: "太陽が昇る前の涼しい時間帯が、ピッタの熱を抑えます。この時間の瞑想は心の炎を穏やかにします。",
+    bedtime: "22:00"
+  },
+  kapha: {
+    time: "5:00〜5:30",
+    reason: "日の出前の活動がカパの重さを軽減します。早起きで1日を活動的にスタートすることで、だるさを防ぎます。",
+    bedtime: "21:30〜22:00"
+  }
+};
+
+const dailySchedules = {
+  vata: {
+    morning: "温かい白湯を飲んでからオイルマッサージ（アビヤンガ）を行い、穏やかなヨガで体を起こしましょう。朝食は温かく消化に良いものをしっかり食べて。",
+    afternoon: "規則正しい時間に昼食を取り、食後は10分ほど休憩しましょう。午後の仕事は集中力が切れやすいので、短い瞑想で気持ちをリセット。",
+    night: "夕食は早めに軽く済ませ、温かいミルクでリラックスタイムを。入浴でしっかり体を温めてから、決まった時間に就寝しましょう。"
+  },
+  pitta: {
+    morning: "涼しい時間帯に起床し、穏やかな瞑想やクーリング呼吸法で1日をスタート。朝食は甘味と苦味を含む食事が理想的です。",
+    afternoon: "昼食を1日のメインにし、しっかり栄養を取りましょう。午後は競争心を刺激する活動を控え、自然の中でリフレッシュすると良いです。",
+    night: "夕食は軽めにし、辛いものは避けましょう。就寝前は画面を見ず、月明かりの散歩やリラックスできる読書で心を静めて。"
+  },
+  kapha: {
+    morning: "早起きして朝日を浴びながら活発に体を動かしましょう。朝食は軽めにし、生姜入りのお湯で消化力を高めてから1日をスタート。",
+    afternoon: "昼食は適量をよく噛んで食べ、食後は散歩や軽い運動で眠気を防ぎましょう。新しいことに挑戦する時間を作ると活力が出ます。",
+    night: "夕食は少量で温かいものを早い時間に。夜は重くならないよう注意し、軽いストレッチの後、早めに就寝して十分な休息を取りましょう。"
+  }
+};
+
+// ========== SCORING ==========
+
+const foodScoring = {
+  spicy:  { vata: 1, pitta: 3, kapha: -1 },
+  sweet:  { vata: -1, pitta: 1, kapha: 2 },
+  sour:   { vata: -1, pitta: 2, kapha: 1 },
+  salty:  { vata: -1, pitta: 2, kapha: 2 },
+  bitter: { vata: 1, pitta: -2, kapha: -2 },
+  oily:   { vata: -2, pitta: 1, kapha: 2 },
+  light:  { vata: 1, pitta: -1, kapha: -1 },
+  cold:   { vata: 2, pitta: -2, kapha: 1 },
+  warm:   { vata: -1, pitta: 2, kapha: -1 }
+};
+
+const moodScoring = {
+  restless:     { vata: 3, pitta: 0, kapha: 0 },
+  anxious:      { vata: 3, pitta: 1, kapha: 0 },
+  irritable:    { vata: 1, pitta: 3, kapha: 0 },
+  angry:        { vata: 0, pitta: 3, kapha: 0 },
+  sluggish:     { vata: 0, pitta: 0, kapha: 3 },
+  sleepy:       { vata: 0, pitta: 0, kapha: 2 },
+  "cold-feeling": { vata: 2, pitta: 0, kapha: 1 },
+  "hot-feeling":  { vata: 0, pitta: 2, kapha: 0 },
+  energetic:    { vata: 1, pitta: 1, kapha: -2 },
+  calm:         { vata: -2, pitta: -1, kapha: 1 }
+};
+
+// ========== HELPERS ==========
+
+function getSeason() {
+  const month = new Date().getMonth() + 1;
+  if (month >= 3 && month <= 5) return "spring";
+  if (month >= 6 && month <= 8) return "summer";
+  if (month >= 9 && month <= 11) return "autumn";
+  return "winter";
+}
+
+function getSeasonJP(season) {
+  return { spring: "春", summer: "夏", autumn: "秋", winter: "冬" }[season];
+}
+
+function getTimeOfDay() {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour <= 9) return "morning";
+  if (hour >= 10 && hour <= 16) return "afternoon";
+  if (hour >= 17 && hour <= 20) return "evening";
+  return "night";
+}
+
+function getTimeOfDayJP(tod) {
+  return { morning: "朝", afternoon: "昼", evening: "夕", night: "夜" }[tod];
+}
+
+function getSelectedValues(selectEl) {
+  var values = [];
+  for (var i = 0; i < selectEl.options.length; i++) {
+    if (selectEl.options[i].selected) {
+      values.push(selectEl.options[i].value);
+    }
+  }
+  return values;
+}
+
+function escapeHTML(str) {
+  var div = document.createElement("div");
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
+// ========== INIT ==========
+
+var currentSeason = getSeason();
+var currentTime = getTimeOfDay();
+
+document.getElementById("season-display").textContent = getSeasonJP(currentSeason);
+document.getElementById("time-display").textContent = getTimeOfDayJP(currentTime);
+
+// ========== FORM SUBMIT ==========
+
+document.getElementById("diagnose-form").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  var sleepInput = document.getElementById("sleep");
+  var foodPref = document.getElementById("food-pref");
+  var mood = document.getElementById("mood");
+
+  var sleepVal = sleepInput.value;
+  var selectedFoods = getSelectedValues(foodPref);
+  var selectedMoods = getSelectedValues(mood);
+
+  // Validation
+  if (sleepVal === "" || sleepVal === null) {
+    alert("睡眠時間を入力してください");
+    return;
+  }
+  if (selectedFoods.length === 0) {
+    alert("食事の好みを最低1つ選択してください");
+    return;
+  }
+  if (selectedMoods.length === 0) {
+    alert("気分を最低1つ選択してください");
+    return;
+  }
+
+  var sleep = parseFloat(sleepVal);
+
+  // Calculate scores
+  var scores = { vata: 0, pitta: 0, kapha: 0 };
+
+  // Sleep scoring
+  if (sleep < 4) { scores.vata += 3; scores.pitta += 1; }
+  else if (sleep <= 6) { scores.vata += 2; }
+  else if (sleep <= 8) { /* no change */ }
+  else if (sleep <= 10) { scores.kapha += 2; }
+  else { scores.kapha += 3; }
+
+  // Food scoring
+  for (var i = 0; i < selectedFoods.length; i++) {
+    var fs = foodScoring[selectedFoods[i]];
+    if (fs) {
+      scores.vata += fs.vata;
+      scores.pitta += fs.pitta;
+      scores.kapha += fs.kapha;
+    }
+  }
+
+  // Mood scoring
+  for (var j = 0; j < selectedMoods.length; j++) {
+    var ms = moodScoring[selectedMoods[j]];
+    if (ms) {
+      scores.vata += ms.vata;
+      scores.pitta += ms.pitta;
+      scores.kapha += ms.kapha;
+    }
+  }
+
+  // Determine primary dosha
+  var primaryDosha = "vata";
+  if (scores.pitta > scores[primaryDosha]) primaryDosha = "pitta";
+  if (scores.kapha > scores[primaryDosha]) primaryDosha = "kapha";
+
+  // Render results
+  renderResults(primaryDosha, scores);
+
+  // Show results, hide form
+  document.getElementById("form-area").style.display = "none";
+  document.getElementById("results").style.display = "block";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// ========== RESET ==========
+
+document.getElementById("btn-reset").addEventListener("click", function() {
+  document.getElementById("results").style.display = "none";
+  document.getElementById("form-area").style.display = "block";
+
+  document.getElementById("sleep").value = "";
+  var foodPref = document.getElementById("food-pref");
+  for (var i = 0; i < foodPref.options.length; i++) {
+    foodPref.options[i].selected = false;
+  }
+  var mood = document.getElementById("mood");
+  for (var j = 0; j < mood.options.length; j++) {
+    mood.options[j].selected = false;
+  }
+
+  // Refresh season & time
+  currentSeason = getSeason();
+  currentTime = getTimeOfDay();
+  document.getElementById("season-display").textContent = getSeasonJP(currentSeason);
+  document.getElementById("time-display").textContent = getTimeOfDayJP(currentTime);
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+// ========== RENDER ==========
+
+function renderResults(dosha, scores) {
+  var info = doshas[dosha];
+
+  // Header
+  var header = document.getElementById("dosha-header");
+  header.className = "dosha-result-header " + dosha;
+  document.getElementById("result-dosha-name").textContent = "あなたの体質: " + escapeHTML(info.name);
+  document.getElementById("result-dosha-element").textContent = "元素: " + escapeHTML(info.element);
+  document.getElementById("result-dosha-chars").textContent = escapeHTML(info.characteristics);
+
+  // Score bars
+  var maxScore = Math.max(scores.vata, scores.pitta, scores.kapha, 1);
+  var barsHTML = "";
+  var doshaKeys = ["vata", "pitta", "kapha"];
+  var doshaLabels = { vata: "ヴァータ", pitta: "ピッタ", kapha: "カパ" };
+  for (var i = 0; i < doshaKeys.length; i++) {
+    var key = doshaKeys[i];
+    var pct = Math.max(0, (scores[key] / maxScore) * 100);
+    barsHTML += '<div class="score-bar-row">' +
+      '<span class="score-bar-label">' + doshaLabels[key] + '</span>' +
+      '<div class="score-bar-track"><div class="score-bar-fill ' + key + '" style="width:' + pct + '%"></div></div>' +
+      '<span class="score-bar-value">' + scores[key] + '</span></div>';
+  }
+  document.getElementById("score-bars").innerHTML = barsHTML;
+  document.getElementById("balance-advice").textContent = info.balance_advice;
+
+  // Seasonal poses
+  var seasonJP = getSeasonJP(currentSeason);
+  document.getElementById("seasonal-pose-title").textContent = seasonJP + "のおすすめヨガポーズ";
+  var sPoses = seasonalPoses[currentSeason][dosha];
+  var sPosesHTML = "";
+  for (var s = 0; s < sPoses.length; s++) {
+    sPosesHTML += '<div class="pose-item">' +
+      '<div class="pose-name">' + escapeHTML(sPoses[s].name) + '</div>' +
+      '<div class="pose-reason">' + escapeHTML(sPoses[s].reason) + '</div>' +
+      '<div class="pose-tips">' + escapeHTML(sPoses[s].tips) + '</div></div>';
+  }
+  document.getElementById("seasonal-poses").innerHTML = sPosesHTML;
+
+  // Time poses
+  var timeJP = getTimeOfDayJP(currentTime);
+  document.getElementById("time-pose-title").textContent = timeJP + "の時間帯におすすめのポーズ";
+  var tPoses = timePoses[currentTime][dosha];
+  var tPosesHTML = "";
+  for (var t = 0; t < tPoses.length; t++) {
+    tPosesHTML += '<div class="pose-item">' +
+      '<div class="pose-name">' + escapeHTML(tPoses[t].name) + '</div>' +
+      '<div class="pose-reason">' + escapeHTML(tPoses[t].reason) + '</div>' +
+      '<div class="pose-tips">推奨時間: ' + escapeHTML(tPoses[t].duration) + '</div></div>';
+  }
+  document.getElementById("time-poses").innerHTML = tPosesHTML;
+
+  // Food advice
+  var fData = foods[dosha];
+  var foodHTML = '<div class="food-section-title recommend">おすすめ食材</div><ul class="food-list">';
+  for (var r = 0; r < fData.recommended.length; r++) {
+    foodHTML += '<li><span class="food-name">' + escapeHTML(fData.recommended[r].food) + '</span> <span class="food-reason">— ' + escapeHTML(fData.recommended[r].reason) + '</span></li>';
+  }
+  foodHTML += '</ul><div class="food-section-title avoid">控えめにする食材</div><ul class="food-list">';
+  for (var a = 0; a < fData.avoid.length; a++) {
+    foodHTML += '<li><span class="food-name">' + escapeHTML(fData.avoid[a].food) + '</span> <span class="food-reason">— ' + escapeHTML(fData.avoid[a].reason) + '</span></li>';
+  }
+  foodHTML += '</ul>';
+  document.getElementById("food-advice").innerHTML = foodHTML;
+
+  // Wake time
+  var wData = wakeTimes[dosha];
+  var wakeHTML = '<div class="wake-info">' +
+    '<div class="wake-box"><div class="wake-label">推奨起床時刻</div><div class="wake-time">' + escapeHTML(wData.time) + '</div></div>' +
+    '<div class="wake-box"><div class="wake-label">就寝目安</div><div class="wake-time">' + escapeHTML(wData.bedtime) + '</div></div></div>' +
+    '<div class="advice-text">' + escapeHTML(wData.reason) + '</div>';
+  document.getElementById("wake-advice").innerHTML = wakeHTML;
+
+  // Daily schedule
+  var sched = dailySchedules[dosha];
+  var schedHTML =
+    '<div class="schedule-item"><div class="schedule-period morning">朝</div><div class="schedule-text"><strong>朝の過ごし方</strong>' + escapeHTML(sched.morning) + '</div></div>' +
+    '<div class="schedule-item"><div class="schedule-period afternoon">昼</div><div class="schedule-text"><strong>昼の過ごし方</strong>' + escapeHTML(sched.afternoon) + '</div></div>' +
+    '<div class="schedule-item"><div class="schedule-period night">夜</div><div class="schedule-text"><strong>夜の過ごし方</strong>' + escapeHTML(sched.night) + '</div></div>';
+  document.getElementById("daily-schedule").innerHTML = schedHTML;
+}
+</script>
+</body>
+</html>
